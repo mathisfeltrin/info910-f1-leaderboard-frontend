@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { checkHealth } from "../services/api";
 import backgroundImage from "../assets/background.jpg";
+import NavBar from "../components/NavBar";
 
 export default function HomePage() {
   const [healthStatus, setHealthStatus] = useState<string>("");
@@ -23,7 +24,10 @@ export default function HomePage() {
   };
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen overflow-hidden">
+    <div className="relative flex flex-col items-center min-h-screen px-6 py-4 overflow-hidden">
+      {/* Navigation Bar */}
+      <NavBar />
+
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-center bg-no-repeat bg-cover"
@@ -31,7 +35,7 @@ export default function HomePage() {
       />
 
       {/* Dark overlay for better text readability */}
-      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-0 bg-black/50" />
 
       {/* Main content */}
       <main className="relative z-10 max-w-5xl px-6 py-12 mx-auto space-y-8 text-center animate-fade-in-up">
@@ -43,31 +47,24 @@ export default function HomePage() {
             </span>
           </h1>
           <h2 className="text-2xl font-light tracking-wide md:text-4xl text-white/90">
-            Live Leaderboard
+            Statistiques des Pilotes
           </h2>
         </div>
 
         {/* Description */}
         <p className="max-w-2xl mx-auto text-lg font-light leading-relaxed delay-200 md:text-xl text-white/70 animate-fade-in">
-          Suivez en temps réel les performances des pilotes et des écuries de
-          Formule 1
+          Consultez les statistiques complètes de tous les pilotes de Formule 1 :
+          victoires, podiums, pole positions et réalisations
         </p>
 
         {/* CTA Buttons */}
         <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row animate-fade-in delay-400">
           <Link
-            to="/leaderboard"
+            to="/drivers"
             className="relative px-8 py-4 overflow-hidden font-semibold text-white transition-all bg-red-600 rounded-lg group hover:scale-105 hover:shadow-2xl hover:shadow-red-500/50"
           >
-            <span className="relative z-10">Voir le classement</span>
+            <span className="relative z-10">Voir tous les pilotes</span>
             <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-r from-red-600 to-orange-600 group-hover:opacity-100" />
-          </Link>
-
-          <Link
-            to="/drivers"
-            className="px-8 py-4 font-semibold text-white transition-all border-2 rounded-lg border-white/20 backdrop-blur-sm hover:bg-white/10 hover:border-white/40 hover:scale-105"
-          >
-            Découvrir les pilotes
           </Link>
         </div>
 

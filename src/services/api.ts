@@ -19,8 +19,8 @@ export async function checkHealth() {
   }
 }
 
-export async function getLeaderboard() {
-  const response = await fetch(`${API_BASE_URL}/drivers/leaderboard`);
+export async function getDriversList() {
+  const response = await fetch(`${API_BASE_URL}/drivers/list`);
 
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);

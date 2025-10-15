@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getDriverDetails } from "../services/api";
+import NavBar from "../components/NavBar";
 
 interface Achievement {
   year: number;
@@ -10,33 +11,41 @@ interface Achievement {
 }
 
 interface DriverDetails {
-  name: string;
+  firstName: string;
+  lastName: string;
+  number: number;
   wins: number;
   podiums: number;
   poles: number;
-  achievements: Achievement[];
+  team: string;
+  age: number;
+  headshotUrl: string;
+  achievements?: Achievement[];
 }
 
 export default function DriverDetailsPage() {
+  const { driverName } = useParams<{ driverName: string }>();
+  const navigate = useNavigate();
   const [driver, setDriver] = useState<DriverDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>("");
 
-  // Pour l'instant, Lewis Hamilton en dur
-  const driverName = "Lewis Hamilton";
-
   useEffect(() => {
-    fetchDriverDetails();
-  }, []);
+    if (driverName) {
+      fetchDriverDetails(driverName);
+    }
+  }, [driverName]);
 
-  const fetchDriverDetails = async () => {
+  const fetchDriverDetails = async (name: string) => {
     try {
       setIsLoading(true);
-      const data = await getDriverDetails(driverName);
+      const data = await getDriverDetails(name);
       setDriver(data);
       setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur lors du chargement");
+      setError(
+        err instanceof Error ? err.message : "Erreur lors du chargement"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -58,39 +67,27 @@ export default function DriverDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-red-950">
-      {/* Header */}
-      <header className="bg-black/30 backdrop-blur-sm border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold text-white hover:text-red-500 transition-colors">
-            F1 <span className="text-red-500">Stats</span>
-          </Link>
-          <nav className="flex gap-4">
-            <Link to="/" className="text-white/70 hover:text-white transition-colors">
-              Accueil
-            </Link>
-            <Link to="/leaderboard" className="text-white/70 hover:text-white transition-colors">
-              Classement
-            </Link>
-          </nav>
-        </div>
-      </header>
+    <div className="min-h-screen px-6 py-4 bg-gradient-to-br from-slate-950 via-slate-900 to-red-950">
+      {/* Navigation Bar */}
+      <NavBar />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-12">
+      <main className="px-6 py-12 mx-auto mt-20 max-w-7xl">
         {isLoading && (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-red-500 border-t-transparent"></div>
-            <p className="text-white/60 mt-4">Chargement des données du pilote...</p>
+          <div className="py-12 text-center">
+            <div className="inline-block w-12 h-12 border-4 border-red-500 rounded-full animate-spin border-t-transparent"></div>
+            <p className="mt-4 text-white/60">
+              Chargement des données du pilote...
+            </p>
           </div>
         )}
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-6 text-center">
-            <p className="text-red-400 text-lg">{error}</p>
+          <div className="p-6 text-center border rounded-lg bg-red-500/10 border-red-500/50">
+            <p className="text-lg text-red-400">{error}</p>
             <button
-              onClick={fetchDriverDetails}
-              className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              onClick={() => driverName && fetchDriverDetails(driverName)}
+              className="px-6 py-2 mt-4 text-white transition-colors bg-red-600 rounded-lg hover:bg-red-700"
             >
               Réessayer
             </button>
@@ -100,52 +97,106 @@ export default function DriverDetailsPage() {
         {!isLoading && !error && driver && (
           <div className="space-y-8">
             {/* Driver Header */}
-            <div className="text-center space-y-4">
-              <h1 className="text-6xl font-bold text-white">{driver.name}</h1>
-              <div className="h-1 w-32 bg-gradient-to-r from-red-500 to-orange-500 mx-auto rounded-full"></div>
+            <div className="flex flex-col items-center space-y-6 md:flex-row md:space-y-0 md:space-x-8">
+              <img
+                src={driver.headshotUrl}
+                alt={`${driver.firstName} ${driver.lastName}`}
+                className="object-cover border-4 rounded-full w-36 h-36 border-white/20"
+                onError={(e) => {
+                  e.currentTarget.src = "https://via.placeholder.com/144";
+                }}
+              />
+              <div className="space-y-2 text-center md:text-left">
+                <div className="flex items-center justify-center gap-3 md:justify-start">
+                  <span className="text-5xl font-bold text-white/50">
+                    #{driver.number}
+                  </span>
+                  <div>
+                    <h1 className="text-5xl font-bold text-white">
+                      {driver.firstName} {driver.lastName}
+                    </h1>
+                    <p className="text-xl text-white/70">{driver.team}</p>
+                  </div>
+                </div>
+                <p className="text-white/60">Âge: {driver.age} ans</p>
+              </div>
             </div>
 
+            <div className="w-32 h-1 mx-auto rounded-full bg-gradient-to-r from-red-500 to-orange-500"></div>
+
             {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6 text-center">
-                <div className="text-5xl font-bold text-yellow-400 mb-2">{driver.wins}</div>
-                <div className="text-white/70 text-lg">Victoires</div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className="p-6 text-center border rounded-lg bg-white/5 backdrop-blur-sm border-white/10">
+                <div className="mb-2 text-5xl font-bold text-yellow-400">
+                  {driver.wins}
+                </div>
+                <div className="text-lg text-white/70">Victoires</div>
               </div>
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6 text-center">
-                <div className="text-5xl font-bold text-blue-400 mb-2">{driver.podiums}</div>
-                <div className="text-white/70 text-lg">Podiums</div>
+              <div className="p-6 text-center border rounded-lg bg-white/5 backdrop-blur-sm border-white/10">
+                <div className="mb-2 text-5xl font-bold text-blue-400">
+                  {driver.podiums}
+                </div>
+                <div className="text-lg text-white/70">Podiums</div>
               </div>
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6 text-center">
-                <div className="text-5xl font-bold text-purple-400 mb-2">{driver.poles}</div>
-                <div className="text-white/70 text-lg">Pole Positions</div>
+              <div className="p-6 text-center border rounded-lg bg-white/5 backdrop-blur-sm border-white/10">
+                <div className="mb-2 text-5xl font-bold text-purple-400">
+                  {driver.poles}
+                </div>
+                <div className="text-lg text-white/70">Pole Positions</div>
               </div>
             </div>
 
             {/* Achievements */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
-              <h2 className="text-3xl font-bold text-white mb-6">Réalisations</h2>
+            {driver.achievements && (
+              <div className="p-6 border rounded-lg bg-white/5 backdrop-blur-sm border-white/10">
+                <h2 className="mb-6 text-3xl font-bold text-white">
+                  Réalisations
+                </h2>
 
-              {driver.achievements.length === 0 ? (
-                <p className="text-white/60 text-center py-8">Aucune réalisation enregistrée</p>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {driver.achievements.map((achievement, index) => (
-                    <div
-                      key={index}
-                      className="bg-black/30 border border-white/10 rounded-lg p-4 hover:bg-white/5 transition-colors"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <span className="text-white/50 text-sm">{achievement.year}</span>
-                        <span className={`text-xs px-2 py-1 rounded border ${getResultColor(achievement.result)}`}>
-                          {achievement.result}
-                        </span>
+                {driver.achievements.length === 0 ? (
+                  <p className="py-8 text-center text-white/60">
+                    Aucune réalisation enregistrée
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {driver.achievements.map((achievement, index) => (
+                      <div
+                        key={index}
+                        className="p-4 transition-colors border rounded-lg bg-black/30 border-white/10 hover:bg-white/5"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <span className="text-sm text-white/50">
+                            {achievement.year}
+                          </span>
+                          <span
+                            className={`text-xs px-2 py-1 rounded border ${getResultColor(
+                              achievement.result
+                            )}`}
+                          >
+                            {achievement.result}
+                          </span>
+                        </div>
+                        <h3 className="mb-1 font-semibold text-white">
+                          {achievement.race}
+                        </h3>
+                        <p className="text-sm text-white/60">
+                          {achievement.description}
+                        </p>
                       </div>
-                      <h3 className="text-white font-semibold mb-1">{achievement.race}</h3>
-                      <p className="text-white/60 text-sm">{achievement.description}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Back Button */}
+            <div className="text-center">
+              <button
+                onClick={() => navigate("/drivers")}
+                className="px-6 py-3 text-white transition-all border-2 rounded-lg border-white/20 backdrop-blur-sm hover:bg-white/10 hover:border-white/40 hover:scale-105"
+              >
+                ← Retour à la liste des pilotes
+              </button>
             </div>
           </div>
         )}
