@@ -1,73 +1,147 @@
-# React + TypeScript + Vite
+# F1 Leaderboard Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Application web React TypeScript pour afficher les pilotes de Formule 1.
 
-Currently, two official plugins are available:
+## 👥 Auteurs
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Mathis Feltrin**
+- **Cyril Pitar**
 
-## React Compiler
+## 🛠️ Stack Technique
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Framework** : React 19.1
+- **Langage** : TypeScript 5.9
+- **Build Tool** : Vite 7.1
+- **Styling** : Tailwind CSS 4.1
+- **Routing** : React Router DOM 7.9
+- **Linting** : ESLint 9
 
-## Expanding the ESLint configuration
+## 📋 Prérequis
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node.js >= 18.x
+- npm >= 9.x
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🚀 Installation
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# Installer les dépendances
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 💻 Développement
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# Lancer le serveur de développement
+npm run dev
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# L'application sera accessible sur http://localhost:5173
 ```
+
+## 🏗️ Build
+
+```bash
+# Compiler le projet pour la production
+npm run build
+
+# Les fichiers de build seront dans le dossier dist/
+```
+
+## 🐳 Docker
+
+### Build de l'image Docker
+
+```bash
+docker build -t f1-leaderboard-frontend:main .
+```
+
+### Lancer le conteneur
+
+```bash
+docker run -p 80:80 f1-leaderboard-frontend:main
+```
+
+L'application sera accessible sur http://localhost
+
+## ☸️ Déploiement Kubernetes
+
+### Avec Minikube
+
+```bash
+# Démarrer Minikube
+minikube start
+
+# Appliquer les configurations Kubernetes
+kubectl apply -f ../TP_910_k8s/k8s/front-dep.yaml
+kubectl apply -f ../TP_910_k8s/k8s/front-svc.yaml
+kubectl apply -f ../TP_910_k8s/k8s/front-ingress.yaml
+
+# Port-forward pour accéder localement
+kubectl port-forward service/frontend 80:80
+```
+
+L'application sera accessible sur http://localhost:80
+
+## 📁 Structure du Projet
+
+```
+frontend/
+├── src/                    # Code source
+│   ├── components/         # Composants React
+│   ├── pages/             # Pages de l'application
+│   ├── App.tsx            # Composant principal
+│   └── main.tsx           # Point d'entrée
+├── public/                # Assets statiques
+├── dist/                  # Build de production
+├── Dockerfile             # Configuration Docker
+├── nginx.conf             # Configuration Nginx
+├── vite.config.ts         # Configuration Vite
+├── tsconfig.json          # Configuration TypeScript
+├── tailwind.config.js     # Configuration Tailwind CSS
+└── package.json           # Dépendances npm
+```
+
+## 🔧 Configuration
+
+### Variables d'environnement
+
+Créer un fichier `.env` à la racine du projet :
+
+```env
+VITE_API_URL=http://localhost:8080
+```
+
+### Nginx
+
+La configuration Nginx est dans `nginx.conf` et inclut :
+
+- Support SPA (Single Page Application)
+- Compression Gzip
+- Cache des assets statiques
+- Redirection des routes vers `index.html`
+
+## 📦 Scripts disponibles
+
+| Script            | Description                          |
+| ----------------- | ------------------------------------ |
+| `npm run dev`     | Lance le serveur de développement    |
+| `npm run build`   | Compile le projet pour la production |
+| `npm run preview` | Prévisualise le build de production  |
+| `npm run lint`    | Vérifie le code avec ESLint          |
+
+## 🔗 Liens Utiles
+
+- [Documentation React](https://react.dev/)
+- [Documentation Vite](https://vitejs.dev/)
+- [Documentation TypeScript](https://www.typescriptlang.org/)
+- [Documentation Tailwind CSS](https://tailwindcss.com/)
+
+## 📝 Notes de développement
+
+- Le projet utilise React 19 avec les dernières fonctionnalités
+- TypeScript est configuré en mode strict
+- Tailwind CSS est intégré avec Vite pour un HMR optimal
+- ESLint est configuré pour React et TypeScript
+
+## 📄 Licence
+
+Projet académique - INFO910 - Année 2025-2026
